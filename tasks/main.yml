@@ -22,6 +22,8 @@
   register: makemkv_bin_installed
 
 - name: Install makemkv
+  become: true
+  become_method: ansible.builtin.sudo
   when: not makemkv_bin_installed.stat.exists
   block:
     - name: Include makemkv_oss tasks
