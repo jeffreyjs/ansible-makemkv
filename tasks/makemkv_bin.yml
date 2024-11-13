@@ -1,0 +1,33 @@
+---
+- name: Create makemkv-bin directory
+  ansible.builtin.file:
+    path: /usr/share/makemkv-bin
+    state: directory
+    mode: "0755"
+  register: makemkv_bin_dir
+
+- name: Unarchive makemkv-bin
+  ansible.builtin.unarchive:
+    src: "{{ makemkv_bin_tar }}"
+    dest: "{{ makemkv_bin_dir.path }}"
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+  register: makemkv_bin
+
+- name: Work around for the ask_eula.sh script
+  ansible.builtin.replace:
+    path: "{{ makemkv_bin_dir.path }}/src/ask_eula.sh"
+    regexp: '^read -e ANSWER$'
+    replace: 'export ANSWER="yes"'
+
+- name: Build the default target
+  community.general.make:
+    chdir: "{{ makemkv_bin_dir.path }}"
+
+- name: Run 'install' target with sudo
+  become: true
+  become_method: ansible.builtin.sudo
+  community.general.make:
+    chdir: "{{ makemkv_bin_dir.path }}"
+    target: install

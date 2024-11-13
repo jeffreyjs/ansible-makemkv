@@ -1,0 +1,33 @@
+---
+- name: Install required packages
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.apt:
+    pkg:
+      - build-essential
+      - less
+      - libavcodec-dev
+      - libc6-dev
+      - libexpat1-dev
+      - libgl1-mesa-dev
+      - libssl-dev
+      - pkg-config
+      - qtbase5-dev
+      - zlib1g-dev
+      - tar
+
+- name: Check if makemkv-bin is installed
+  ansible.builtin.stat:
+    path: /usr/bin/makemkv
+  register: makemkv_bin_installed
+
+- name: Install makemkv
+  when: not makemkv_bin_installed.stat.exists
+  block:
+    - name: Include makemkv_oss tasks
+      ansible.builtin.include_tasks:
+        file: makemkv_oss.yml
+
+    - name: Include makemkv_bin tasks
+      ansible.builtin.include_tasks:
+        file: makemkv_bin.yml

@@ -1,0 +1,20 @@
+---
+
+makemkv_packages:
+  - build-essential
+  - libavcodec-dev
+  - libc6-dev
+  - libexpat1-dev
+  - libgl1-mesa-dev
+  - libssl-dev
+  - pkg-config
+  - qtbase5-dev
+  - zlib1g-dev
+
+makemkv_url: https://www.makemkv.com/download
+
+makemkv_bin_tar: "{{ makemkv_url }}/makemkv-bin-{{ makemkv_version }}.tar.gz"
+
+makemkv_oss_tar: "{{ makemkv_url }}/makemkv-oss-{{ makemkv_version }}.tar.gz"
+
+makemkv_version: 1.17.8

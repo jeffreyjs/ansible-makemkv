@@ -1,0 +1,17 @@
+---
+- name: Converge
+  hosts: all
+
+  vars:
+    ansible_remote_tmp: /tmp
+
+  pre_tasks:
+    - name: Update apt cache on Debian systems.
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+  tasks:
+    - name: Include makemkv
+      ansible.builtin.include_role:
+        name: jeffreyjs.makemkv

@@ -1,0 +1,38 @@
+---
+- name: Create makemkv-oss directory
+  ansible.builtin.file:
+    path: /usr/share/makemkv-oss
+    state: directory
+    mode: "0755"
+  register: makemkv_oss_dir
+
+- name: Unarchive makemkv-oss
+  ansible.builtin.unarchive:
+    src: "{{ makemkv_oss_tar }}"
+    dest: "{{ makemkv_oss_dir.path }}"
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+  register: makemkv_oss
+
+- name: Configure makemkv-oss
+  ansible.builtin.shell: |
+    set -e
+    ./configure
+  register: makemkv_oss_configure
+  changed_when: makemkv_oss_configure.rc != 0
+  args:
+    executable: /bin/bash
+    chdir: "{{ makemkv_oss_dir.path }}"
+
+- name: Build the default target
+  community.general.make:
+    chdir: "{{ makemkv_oss_dir.path }}"
+
+- name: Run 'install' target with sudo
+  become: true
+  become_method: ansible.builtin.sudo
+  community.general.make:
+    chdir: "{{ makemkv_oss_dir.path }}"
+    target: install
+  
